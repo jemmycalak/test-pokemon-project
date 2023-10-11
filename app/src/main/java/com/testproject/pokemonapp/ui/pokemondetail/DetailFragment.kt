@@ -114,7 +114,9 @@ class DetailFragment : Fragment(), InputNameDialogFragment.Listener {
             specialAttack.text = pokemon.stats[3].baseStat.toString()
             specialDefense.text = pokemon.stats[4].baseStat.toString()
             speed.text = pokemon.stats[5].baseStat.toString()
-            pokemonName.text = pokemon.name
+
+            val name = if (args.isCatched) args.pokemon.name else pokemon.name
+            pokemonName.text = name
         }
     }
 
