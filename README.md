@@ -36,6 +36,7 @@ This project has been created with gradle version 7.0, to build please check tha
 - Navigation Components
 - Scope Functions
 - ViewBinding
+- Room Local Database
 - Hilt - Dependency Injection
 - MockK and JUnit for unit tests
 
