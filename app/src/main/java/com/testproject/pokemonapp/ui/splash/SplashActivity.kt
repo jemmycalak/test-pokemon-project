@@ -6,7 +6,7 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import com.testproject.pokemonapp.databinding.ActivitySplashBinding
-import com.testproject.pokemonapp.ui.HomeActivity
+import com.testproject.pokemonapp.ui.home.HomeActivity
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay

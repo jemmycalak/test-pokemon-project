@@ -1,4 +1,4 @@
-package com.testproject.pokemonapp.ui
+package com.testproject.pokemonapp.ui.home
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
