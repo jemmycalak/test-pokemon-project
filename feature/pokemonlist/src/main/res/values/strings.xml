@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="fragment_detail_hp_label">hp</string>
+    <string name="fragment_detail_attack_label">attack</string>
+    <string name="fragment_detail_defense_label">defense</string>
+    <string name="fragment_detail_special_attack_label">special-attack</string>
+    <string name="fragment_detail_special_defense_label">special-defense</string>
+    <string name="fragment_detail_speed_label">speed</string>
+    <string name="title_history">History</string>
+    <string name="title_home">Home</string>
+    <string name="catch_pokemon">Tangkap</string>
+    <string name="type">Type</string>
+    <string name="rename_pokemon">Rename</string>
+    <string name="release_pokemon">Release</string>
+</resources>

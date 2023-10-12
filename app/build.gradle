@@ -8,12 +8,12 @@ plugins {
 }
 
 android {
-    compileSdk 33
+    compileSdk 34
 
     defaultConfig {
         applicationId "com.testproject.pokemonapp"
-        minSdk 23
-        targetSdk 33
+        minSdk 24
+        targetSdk 34
         versionCode 1
         versionName "1.0"
 
@@ -44,6 +44,16 @@ android {
 }
 
 dependencies {
+
+    implementation project(":core")
+    implementation project(":data:datasource")
+    implementation project(":data:local")
+    implementation project(":data:model")
+    implementation project(":data:remote")
+    implementation project(":domain:pokemonusecase")
+    implementation project(":feature:pokemonlist")
+    implementation project(":feature:mypokemon")
+
     def room_version = "2.5.2"
 
     implementation "androidx.room:room-runtime:$room_version"

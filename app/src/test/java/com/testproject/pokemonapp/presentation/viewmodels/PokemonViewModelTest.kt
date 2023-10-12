@@ -4,7 +4,7 @@ import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.testproject.pokemonapp.core.Resource
 import com.testproject.pokemonapp.data.model.Pokemon
 import com.testproject.pokemonapp.data.repository.PokemonRepository
-import com.testproject.pokemonapp.ui.pokemondetail.DetailPokemonViewModel
+import com.testproject.pokemonlist.ui.pokemondetail.DetailPokemonViewModel
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
 import io.mockk.impl.annotations.RelaxedMockK
