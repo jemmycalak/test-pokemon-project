@@ -36,6 +36,12 @@ class InputNameDialogFragment : DialogFragment() {
 
         dialog?.window?.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE)
         initUi()
+        initData()
+    }
+
+    private fun initData() {
+        val name = arguments?.getString(NAME, "")
+        binding.pokemonName.setText(name)
     }
 
     private fun initUi() {
@@ -49,6 +55,17 @@ class InputNameDialogFragment : DialogFragment() {
             cancelSave.apply {
                 setOnClickListener {
                     dismiss()
+                }
+            }
+        }
+    }
+
+    companion object {
+        const val NAME = "name"
+        fun create(name: String): InputNameDialogFragment {
+            return InputNameDialogFragment().apply {
+                arguments = Bundle().apply {
+                    putString(NAME, name)
                 }
             }
         }

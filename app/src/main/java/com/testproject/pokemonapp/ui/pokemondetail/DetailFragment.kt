@@ -56,7 +56,7 @@ class DetailFragment : Fragment(), InputNameDialogFragment.Listener {
             renamePokemon.apply {
                 visibility = visibleButtonRelease
                 setOnClickListener {
-                    InputNameDialogFragment().apply {
+                    InputNameDialogFragment.create(args.pokemon.name).apply {
                         setListener(this@DetailFragment)
                     }.show(childFragmentManager, this@DetailFragment::class.java.name)
                 }
