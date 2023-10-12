@@ -4,9 +4,9 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.testproject.pokemonapp.data.model.PokemonResponseModel
-import com.testproject.pokemonapp.data.repository.PokemonRepository
-import com.testproject.pokemonapp.utils.Event
+import com.testproject.model.PokemonResponseModel
+import com.testproject.core.Event
+import com.testproject.pokemonusecase.PokemonRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject

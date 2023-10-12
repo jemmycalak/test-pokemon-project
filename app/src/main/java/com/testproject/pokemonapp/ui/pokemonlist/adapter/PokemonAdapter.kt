@@ -3,7 +3,7 @@ package com.testproject.pokemonapp.ui.pokemonlist.adapter
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
-import com.testproject.pokemonapp.data.model.PokemonResponseModel
+import com.testproject.model.PokemonResponseModel
 
 /**
  * @author Jemmy

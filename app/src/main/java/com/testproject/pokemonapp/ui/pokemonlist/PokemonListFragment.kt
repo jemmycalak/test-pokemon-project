@@ -7,8 +7,7 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
-import com.google.android.material.snackbar.Snackbar
-import com.testproject.pokemonapp.data.model.PokemonResponseModel
+import com.testproject.model.PokemonResponseModel
 import com.testproject.pokemonapp.databinding.FragmentPokemonListBinding
 import com.testproject.pokemonapp.ui.pokemonlist.adapter.PokemonAdapter
 import com.testproject.pokemonapp.ui.pokemonlist.adapter.PokemonListener
@@ -17,10 +16,6 @@ import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
 class PokemonListFragment : Fragment(), PokemonListener {
-
-    companion object {
-        fun newInstance() = PokemonListFragment()
-    }
 
     private val viewModel: PokemonListViewModel by viewModels()
     private lateinit var binding: FragmentPokemonListBinding

@@ -6,7 +6,7 @@
     <data>
         <variable
             name="data"
-            type="com.testproject.pokemonapp.data.model.PokemonResponseModel" />
+            type="com.testproject.model.PokemonResponseModel" />
     </data>
 
     <androidx.cardview.widget.CardView

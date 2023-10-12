@@ -6,10 +6,10 @@ import android.view.animation.Animation
 import android.view.animation.AnimationUtils
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import com.bumptech.glide.Glide
+import com.testproject.model.PokemonResponseModel
 import com.testproject.pokemonapp.R
-import com.testproject.pokemonapp.data.model.PokemonResponseModel
 import com.testproject.pokemonapp.databinding.ItemPokemonBinding
-import com.testproject.pokemonapp.getIdFromUrl
+import com.testproject.core.getIdFromUrl
 
 /**
  * @author Jemmy

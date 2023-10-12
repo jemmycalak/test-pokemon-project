@@ -7,8 +7,7 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
-import com.google.android.material.snackbar.Snackbar
-import com.testproject.pokemonapp.data.model.PokemonResponseModel
+import com.testproject.model.PokemonResponseModel
 import com.testproject.pokemonapp.databinding.FragmentPokemonHistoryBinding
 import com.testproject.pokemonapp.ui.pokemonlist.adapter.PokemonAdapter
 import com.testproject.pokemonapp.ui.pokemonlist.adapter.PokemonListener

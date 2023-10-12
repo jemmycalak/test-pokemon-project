@@ -15,7 +15,7 @@
             app:destination="@id/detail_pokemon_nav_graph">
             <argument
                 android:name="pokemon"
-                app:argType="com.testproject.pokemonapp.data.model.PokemonResponseModel" />
+                app:argType="com.testproject.model.PokemonResponseModel" />
         </action>
     </fragment>
 </navigation>

@@ -10,10 +10,10 @@ import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.bumptech.glide.Glide
 import com.google.android.material.snackbar.Snackbar
+import com.testproject.model.Pokemon
 import com.testproject.pokemonapp.core.Resource
-import com.testproject.pokemonapp.data.model.Pokemon
 import com.testproject.pokemonapp.databinding.FragmentDetailBinding
-import com.testproject.pokemonapp.getIdFromUrl
+import com.testproject.core.getIdFromUrl
 import com.testproject.pokemonapp.ui.renamepokemon.InputNameDialogFragment
 import com.testproject.pokemonapp.utils.showSnackbar
 import dagger.hilt.android.AndroidEntryPoint

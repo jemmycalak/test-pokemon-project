@@ -11,7 +11,7 @@
         tools:layout="@layout/fragment_detail" >
         <argument
             android:name="pokemon"
-            app:argType="com.testproject.pokemonapp.data.model.PokemonResponseModel" />
+            app:argType="com.testproject.model.PokemonResponseModel" />
         <argument
             android:name="isCatched"
             app:argType="boolean"

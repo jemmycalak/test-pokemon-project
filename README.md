@@ -16,8 +16,8 @@
 This project requires the following
 
 1. Android Studio Chipmunk | 2021.2.1 Patch 1
-2. Android SDK 23 or above.
-3. AGP 7.2.1.
+2. Android SDK 24 or above.
+3. AGP 7.4.2.
 
 This is a app built with Kotlin.
 
@@ -27,6 +27,8 @@ This project has been created with gradle version 7.0, to build please check tha
 
 ## Libraries Used
 - MVVM - ViewModel
+- Modular Code
+- Clean Architecture
 - Fragments
 - Safe Args
 - LiveData
