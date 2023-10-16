@@ -7,11 +7,15 @@
     <include app:graph="@navigation/detail_pokemon_nav_graph"/>
     <fragment
         android:id="@+id/pokemonHistoryListFragment"
-        android:name="com.testproject.mypokemon.histories.PokemonHistoryListFragment"
+        android:name="com.testproject.mypokemon.histories.history.PokemonHistoryListFragment"
         android:label="My Pokemon" >
         <action
             android:id="@+id/action_pokemonHistoryListFragment_to_detailFragment"
-            app:destination="@id/detail_pokemon_nav_graph">
+            app:destination="@id/detail_pokemon_nav_graph"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right">
             <argument
                 android:name="pokemon"
                 app:argType="com.testproject.model.PokemonResponseModel" />

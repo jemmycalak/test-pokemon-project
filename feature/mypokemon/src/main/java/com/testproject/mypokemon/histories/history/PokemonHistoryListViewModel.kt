@@ -1,4 +1,4 @@
-package com.testproject.mypokemon.histories
+package com.testproject.mypokemon.histories.history
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData

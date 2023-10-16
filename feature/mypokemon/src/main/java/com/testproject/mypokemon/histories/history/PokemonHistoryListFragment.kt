@@ -1,4 +1,4 @@
-package com.testproject.mypokemon.histories
+package com.testproject.mypokemon.histories.history
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -9,9 +9,9 @@ import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import com.testproject.model.PokemonResponseModel
 import com.testproject.mypokemon.databinding.FragmentPokemonHistoryBinding
-import com.testproject.pokemonlist.ui.pokemonlist.adapter.PokemonAdapter
-import com.testproject.pokemonlist.ui.pokemonlist.adapter.PokemonListener
+import com.testproject.mypokemon.histories.history.adapter.PokemonAdapter
 import com.testproject.pokemonapp.utils.showSnackbar
+import com.testproject.mypokemon.histories.history.adapter.PokemonListener
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -35,6 +35,11 @@ class PokemonHistoryListFragment : Fragment(), PokemonListener {
         setUI()
         setObserver()
         viewModel.getPokemonList()
+
+        /*val request = NavDeepLinkRequest.Builder
+            .fromUri("android-app://example.google.app/settings_fragment_two".toUri())
+            .build()
+        findNavController().navigate(request)*/
     }
 
     private fun setUI() {

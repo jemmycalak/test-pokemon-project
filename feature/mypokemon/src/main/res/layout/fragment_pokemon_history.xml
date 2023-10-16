@@ -12,6 +12,6 @@
         android:orientation="vertical"
         app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
         app:spanCount="2"
-        tools:listitem="@layout/item_pokemon" />
+        tools:listitem="@layout/item_mypokemon" />
 
 </FrameLayout>

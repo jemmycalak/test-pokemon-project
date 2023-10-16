@@ -12,7 +12,11 @@
         tools:layout="@layout/fragment_pokemon_list" >
         <action
             android:id="@+id/action_pokemonListFragment_to_detailFragment"
-            app:destination="@id/detail_pokemon_nav_graph">
+            app:destination="@id/detail_pokemon_nav_graph"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right">
             <argument
                 android:name="pokemon"
                 app:argType="com.testproject.model.PokemonResponseModel" />

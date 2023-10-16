@@ -40,11 +40,11 @@ android {
 }
 
 dependencies {
-
     implementation project(":core")
     implementation project(":data:model")
     implementation project(":domain:pokemonusecase")
-    implementation project(":feature:pokemonlist")
+    implementation project(":feature:mypokemon_contract")
+    implementation project(":feature:pokemonlist_contract")
 
     // KTX - ViewModel y LiveData
     implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.5.1'

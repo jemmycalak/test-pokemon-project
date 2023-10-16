@@ -44,7 +44,6 @@ android {
 }
 
 dependencies {
-
     implementation project(":core")
     implementation project(":data:datasource")
     implementation project(":data:local")
