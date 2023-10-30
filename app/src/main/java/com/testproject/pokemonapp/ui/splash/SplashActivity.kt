@@ -2,10 +2,11 @@ package com.testproject.pokemonapp.ui.splash
 
 import android.content.Intent
 import android.os.Bundle
+import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
-import com.testproject.pokemonapp.databinding.ActivitySplashBinding
+import com.testproject.pokemonapp.component.SplashComponet
 import com.testproject.pokemonapp.ui.home.HomeActivity
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
@@ -16,12 +17,12 @@ import kotlinx.coroutines.launch
 class SplashActivity : AppCompatActivity() {
 
     private val viewModel: SplashViewModel by viewModels()
-    private lateinit var binding: ActivitySplashBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = ActivitySplashBinding.inflate(layoutInflater)
-        setContentView(binding.root)
+        setContent {
+            SplashComponet()
+        }
 
         CoroutineScope(lifecycleScope.coroutineContext).launch {
             delay(3000)
