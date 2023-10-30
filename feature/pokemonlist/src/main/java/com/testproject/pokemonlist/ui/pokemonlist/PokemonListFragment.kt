@@ -4,9 +4,18 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
+import com.testproject.core.theme.PokemonAppTheme
 import com.testproject.model.PokemonResponseModel
 import com.testproject.pokemonlist.ui.pokemonlist.adapter.PokemonAdapter
 import com.testproject.pokemonlist.ui.pokemonlist.adapter.PokemonListener
@@ -60,5 +69,26 @@ class PokemonListFragment : Fragment(), PokemonListener {
                 data,
             ),
         )
+    }
+}
+
+
+@Composable
+fun PokemonList(modifier: Modifier = Modifier) {
+    Box(
+        modifier = modifier
+            .fillMaxWidth()
+            .fillMaxHeight(),
+        contentAlignment = Alignment.Center,
+    ) {
+        Text(text = "List Pokemnon")
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun MyPokemonPreview() {
+    PokemonAppTheme {
+        PokemonList()
     }
 }

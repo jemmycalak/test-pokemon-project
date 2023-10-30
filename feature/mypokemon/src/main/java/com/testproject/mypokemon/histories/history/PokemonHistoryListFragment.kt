@@ -4,14 +4,23 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
+import com.testproject.core.theme.PokemonAppTheme
 import com.testproject.model.PokemonResponseModel
 import com.testproject.mypokemon.databinding.FragmentPokemonHistoryBinding
 import com.testproject.mypokemon.histories.history.adapter.PokemonAdapter
-import com.testproject.pokemonapp.utils.showSnackbar
 import com.testproject.mypokemon.histories.history.adapter.PokemonListener
+import com.testproject.pokemonapp.utils.showSnackbar
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -65,5 +74,25 @@ class PokemonHistoryListFragment : Fragment(), PokemonListener {
                 data,
             ),
         )
+    }
+}
+
+@Composable
+fun MyPokemon(modifier: Modifier = Modifier) {
+    Box(
+        modifier = modifier
+            .fillMaxWidth()
+            .fillMaxHeight(),
+        contentAlignment = Alignment.Center,
+    ) {
+        Text(text = "My Pokemnon")
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun MyPokemonPreview() {
+    PokemonAppTheme {
+        MyPokemon()
     }
 }

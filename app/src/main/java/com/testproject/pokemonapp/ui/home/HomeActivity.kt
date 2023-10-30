@@ -1,43 +1,85 @@
 package com.testproject.pokemonapp.ui.home
 
+import android.app.Activity
 import android.os.Bundle
+import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
-import androidx.navigation.NavController
-import androidx.navigation.fragment.NavHostFragment
-import androidx.navigation.ui.AppBarConfiguration
-import androidx.navigation.ui.navigateUp
-import androidx.navigation.ui.setupActionBarWithNavController
-import androidx.navigation.ui.setupWithNavController
-import com.testproject.pokemonapp.R
-import com.testproject.pokemonapp.databinding.ActivityHomeBinding
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
+import com.testproject.core.theme.PokemonAppTheme
+import com.testproject.mypokemon.histories.history.MyPokemon
+import com.testproject.pokemonapp.component.BottomBar
+import com.testproject.pokemonlist.ui.pokemondetail.DetailPokemon
+import com.testproject.pokemonlist.ui.pokemonlist.PokemonList
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
 class HomeActivity : AppCompatActivity() {
 
-    private lateinit var binding: ActivityHomeBinding
-    private lateinit var navController: NavController
-    private lateinit var appBarConfiguration: AppBarConfiguration
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = ActivityHomeBinding.inflate(layoutInflater)
-        setContentView(binding.root)
-
-        val navHostFragment =
-            supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as NavHostFragment
-        navController = navHostFragment.navController
-        appBarConfiguration = AppBarConfiguration(
-            setOf(
-                com.testproject.pokemonlist_contract.R.id.pokemonListFragment,
-                com.testproject.mypokemon_contract.R.id.pokemonHistoryListFragment,
-            ),
-        )
-        binding.bottomNav.setupWithNavController(navController)
-        setupActionBarWithNavController(navController, appBarConfiguration)
+        setContent {
+            PokemonAppTheme {
+                // A surface container using the 'background' color from the theme
+                Surface(
+                    modifier = Modifier.fillMaxSize(),
+                    color = MaterialTheme.colorScheme.background,
+                ) {
+                    PokemonMain()
+                }
+            }
+        }
     }
+}
 
-    override fun onSupportNavigateUp(): Boolean {
-        return navController.navigateUp(appBarConfiguration)
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun PokemonMain() {
+    val rememberNavCompose = rememberNavController()
+    val activity = (LocalContext.current as Activity)
+    val home = stringResource(id = ScreenNav.HOME.title)
+    val history = stringResource(id = ScreenNav.HISTORY.title)
+    val detailPokemon = stringResource(id = ScreenNav.DETAIL_POKEMON.title)
+
+    Scaffold(
+        bottomBar = {
+            BottomBar(navController = rememberNavCompose)
+        },
+    ) { paddingValues ->
+        NavHost(
+            navController = rememberNavCompose,
+            startDestination = home,
+            Modifier.padding(paddingValues),
+        ) {
+            composable(home) {
+                PokemonList()
+            }
+            composable(history) {
+                MyPokemon()
+            }
+            composable(detailPokemon) {
+                DetailPokemon()
+            }
+        }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun BottomBarPreview() {
+    PokemonAppTheme {
+        PokemonMain()
     }
 }
