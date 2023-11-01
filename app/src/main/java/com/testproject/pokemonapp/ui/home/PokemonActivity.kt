@@ -9,21 +9,29 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarDuration
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.testproject.core.theme.PokemonAppTheme
-import com.testproject.mypokemon.histories.history.MyPokemon
+import com.testproject.mypokemon.histories.navigation.historyPokemonListNavGraph
 import com.testproject.pokemonapp.component.BottomBar
-import com.testproject.pokemonlist.ui.pokemondetail.DetailPokemon
-import com.testproject.pokemonlist.ui.pokemonlist.PokemonList
+import com.testproject.pokemonlist.ui.navigation.detailPokemonNavGraph
+import com.testproject.pokemonlist.ui.navigation.navigateToPokemonList
+import com.testproject.pokemonlist.ui.navigation.pokemonListNavGraph
+import com.testproject.splash.navigation.SPLASH_ROUTE
+import com.testproject.splash.navigation.splashNavGraph
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class HomeActivity : AppCompatActivity() {
@@ -48,31 +56,46 @@ class HomeActivity : AppCompatActivity() {
 @Composable
 fun PokemonMain() {
     val rememberNavCompose = rememberNavController()
+    val scope = rememberCoroutineScope()
+    val snackbarHostState = remember { SnackbarHostState() }
     val activity = (LocalContext.current as Activity)
-    val home = stringResource(id = ScreenNav.HOME.title)
-    val history = stringResource(id = ScreenNav.HISTORY.title)
-    val detailPokemon = stringResource(id = ScreenNav.DETAIL_POKEMON.title)
-
     Scaffold(
         bottomBar = {
             BottomBar(navController = rememberNavCompose)
         },
+        snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
     ) { paddingValues ->
-        NavHost(
+        NavHostPokemon(
+            modifier = Modifier.padding(paddingValues),
             navController = rememberNavCompose,
-            startDestination = home,
-            Modifier.padding(paddingValues),
-        ) {
-            composable(home) {
-                PokemonList()
-            }
-            composable(history) {
-                MyPokemon()
-            }
-            composable(detailPokemon) {
-                DetailPokemon()
-            }
-        }
+            showActionBar = { message, action ->
+                scope.launch {
+                    snackbarHostState.showSnackbar(
+                        message = message,
+                        actionLabel = action,
+                        duration = SnackbarDuration.Short,
+                    )
+                }
+            },
+        )
+    }
+}
+
+@Composable
+fun NavHostPokemon(
+    modifier: Modifier = Modifier,
+    navController: NavHostController,
+    showActionBar: (String, String?) -> Unit,
+) {
+    NavHost(
+        navController = navController,
+        startDestination = SPLASH_ROUTE,
+        modifier,
+    ) {
+        splashNavGraph(onNavigateToHome = navController::navigateToPokemonList)
+        pokemonListNavGraph(navController, showActionBar)
+        historyPokemonListNavGraph()
+        detailPokemonNavGraph(navController)
     }
 }
 

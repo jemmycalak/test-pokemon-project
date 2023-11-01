@@ -18,13 +18,12 @@ import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.bumptech.glide.Glide
 import com.google.android.material.snackbar.Snackbar
-import com.testproject.model.Pokemon
-import com.testproject.pokemonapp.core.Resource
 import com.testproject.core.getIdFromUrl
 import com.testproject.core.theme.PokemonAppTheme
+import com.testproject.model.Pokemon
+import com.testproject.pokemonapp.core.Resource
 import com.testproject.pokemonapp.utils.showSnackbar
 import com.testproject.pokemonlist.databinding.FragmentDetailBinding
-import com.testproject.pokemonlist.ui.pokemonlist.PokemonList
 import com.testproject.pokemonlist.ui.renamepokemon.InputNameDialogFragment
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -88,6 +87,7 @@ class DetailFragment : Fragment(), InputNameDialogFragment.Listener {
                 is Resource.Success -> {
                     setupViews(it.data)
                 }
+
                 is Resource.Failure -> Snackbar.make(
                     requireView(),
                     "Error get detail pokemon",
@@ -101,9 +101,11 @@ class DetailFragment : Fragment(), InputNameDialogFragment.Listener {
                     is DetailPokemonEvent.OnSuccessInsertPokemon -> {
                         requireView().showSnackbar("Sukses Menangkap Pokemon")
                     }
+
                     is DetailPokemonEvent.OnSuccessReleasePokemon -> {
                         requireView().showSnackbar("Sukses Release Pokemon")
                     }
+
                     is DetailPokemonEvent.OnSuccessRenamePokemon -> {
                         requireView().showSnackbar("Sukses Rename Pokemon")
                         binding.pokemonName.text = event.name
@@ -143,7 +145,6 @@ class DetailFragment : Fragment(), InputNameDialogFragment.Listener {
         )
     }
 }
-
 
 @Composable
 fun DetailPokemon(modifier: Modifier = Modifier) {

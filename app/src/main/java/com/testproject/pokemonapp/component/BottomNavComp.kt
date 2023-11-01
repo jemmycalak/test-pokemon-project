@@ -25,43 +25,46 @@ fun BottomBar(
     modifier: Modifier = Modifier,
     navController: NavHostController,
 ) {
-    val items = listOf(
+    val menuItems = listOf(
         ScreenNav.HOME,
         ScreenNav.HISTORY,
     )
 
-    NavigationBar(modifier = modifier, containerColor = Color.White) {
-        val navBackStackEntry by navController.currentBackStackEntryAsState()
-        val currentDestination = navBackStackEntry?.destination
-        items.forEach { screen ->
-            val title = stringResource(id = screen.title)
-            val icon = painterResource(id = screen.icon)
-            val isSelected = currentDestination?.route == title
-            NavigationBarItem(
-                icon = {
-                    Image(
-                        painter = icon,
-                        contentDescription = title,
-                    )
-                },
-                label = { Text(stringResource(id = screen.title)) },
-                selected = isSelected,
-                onClick = {
-                    navController.navigate(title) {
-                        // Pop up to the start destination of the graph to
-                        // avoid building up a large stack of destinations
-                        // on the back stack as users select items
-                        popUpTo(navController.graph.findStartDestination().id) {
-                            saveState = true
+    val navBackStackEntry by navController.currentBackStackEntryAsState()
+    val currentRoute = navBackStackEntry?.destination?.route
+    if (currentRoute in menuItems.map { it.route }) {
+        NavigationBar(modifier = modifier, containerColor = Color.White) {
+            val currentDestination = navBackStackEntry?.destination
+            menuItems.forEach { screen ->
+                val title = stringResource(id = screen.title)
+                val icon = painterResource(id = screen.icon)
+                val isSelected = currentDestination?.route == screen.route
+                NavigationBarItem(
+                    icon = {
+                        Image(
+                            painter = icon,
+                            contentDescription = title,
+                        )
+                    },
+                    label = { Text(stringResource(id = screen.title)) },
+                    selected = isSelected,
+                    onClick = {
+                        navController.navigate(screen.route) {
+                            // Pop up to the start destination of the graph to
+                            // avoid building up a large stack of destinations
+                            // on the back stack as users select items
+                            popUpTo(navController.graph.findStartDestination().id) {
+                                saveState = true
+                            }
+                            // Avoid multiple copies of the same destination when
+                            // reselecting the same item
+                            launchSingleTop = true
+                            // Restore state when reselecting a previously selected item
+                            restoreState = true
                         }
-                        // Avoid multiple copies of the same destination when
-                        // reselecting the same item
-                        launchSingleTop = true
-                        // Restore state when reselecting a previously selected item
-                        restoreState = true
-                    }
-                },
-            )
+                    },
+                )
+            }
         }
     }
 }
