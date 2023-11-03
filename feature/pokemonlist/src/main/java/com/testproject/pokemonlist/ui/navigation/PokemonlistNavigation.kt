@@ -8,7 +8,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import androidx.navigation.navDeepLink
 import com.testproject.pokemonlist.ui.pokemondetail.DetailPokemon
-import com.testproject.pokemonlist.ui.pokemonlist.PokemonList
+import com.testproject.pokemonlist.ui.pokemonlist.PokemonListScreen
 
 /**
  * @author Jemmy
@@ -26,7 +26,7 @@ fun NavGraphBuilder.pokemonListNavGraph(
     showActionBar: (String, String?) -> Unit,
 ) {
     composable(route = POKEMONLIST_ROUTE) {
-        PokemonList(
+        PokemonListScreen(
             onPokeminItemClicked = controller::navigateToDetailPokemon,
             showActionBar = showActionBar,
         )

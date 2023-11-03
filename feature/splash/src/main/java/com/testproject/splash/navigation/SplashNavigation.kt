@@ -12,6 +12,6 @@ import com.testproject.splash.SplashComponet
 const val SPLASH_ROUTE = "splashpokemon_route"
 fun NavGraphBuilder.splashNavGraph(onNavigateToHome: (String) -> Unit) {
     composable(route = SPLASH_ROUTE) {
-        SplashComponet(onNavigateToHome = onNavigateToHome)
+        SplashComponet(onNavigateToHome = { onNavigateToHome(SPLASH_ROUTE) })
     }
 }
