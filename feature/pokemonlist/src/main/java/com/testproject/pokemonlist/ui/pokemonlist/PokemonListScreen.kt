@@ -52,7 +52,8 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
 import com.testproject.core.component.LoadingWheel
-import com.testproject.core.getIdFromUrl
+import com.testproject.core.extention.getIdFromUrl
+import com.testproject.core.extention.getImageUrl
 import com.testproject.core.templete.MainTemplate
 import com.testproject.core.theme.Dimens
 import com.testproject.core.theme.PokemonAppTheme
@@ -241,11 +242,16 @@ fun PokemonItem(
     Card(
         modifier = modifier
             .padding(4.dp)
-            .clickable(enabled = true, onClick = { onPokeminItemClicked.invoke(pokemon.id) }),
+            .clickable(
+                enabled = true,
+                onClick = {
+                    onPokeminItemClicked.invoke(pokemon.url.getIdFromUrl().toInt())
+                },
+            ),
     ) {
         Column(modifier = modifier.align(Alignment.CenterHorizontally)) {
             GlideImage(
-                model = getImageUrl(pokemon.url),
+                model = pokemon.url.getImageUrl(),
                 contentDescription = pokemon.name,
                 modifier.align(Alignment.CenterHorizontally),
             )
@@ -256,17 +262,6 @@ fun PokemonItem(
                     .padding(bottom = 4.dp),
             )
         }
-    }
-}
-
-private fun getImageUrl(url: String): String {
-    val IMAGE_HOST_URL =
-        "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/"
-    return try {
-        val id = url.getIdFromUrl()
-        "$IMAGE_HOST_URL/$id.png"
-    } catch (e: Exception) {
-        ""
     }
 }
 

@@ -26,6 +26,7 @@ import com.testproject.core.theme.PokemonAppTheme
 import com.testproject.mypokemon.histories.navigation.historyPokemonListNavGraph
 import com.testproject.pokemonapp.component.BottomBar
 import com.testproject.pokemonlist.ui.navigation.detailPokemonNavGraph
+import com.testproject.pokemonlist.ui.navigation.navigateToDetailPokemon
 import com.testproject.pokemonlist.ui.navigation.navigateToPokemonList
 import com.testproject.pokemonlist.ui.navigation.pokemonListNavGraph
 import com.testproject.splash.navigation.SPLASH_ROUTE
@@ -92,10 +93,19 @@ fun NavHostPokemon(
         startDestination = SPLASH_ROUTE,
         modifier,
     ) {
-        splashNavGraph(onNavigateToHome = navController::navigateToPokemonList)
-        pokemonListNavGraph(navController, showActionBar)
-        historyPokemonListNavGraph()
-        detailPokemonNavGraph(navController)
+        splashNavGraph(
+            onNavigateToHome = navController::navigateToPokemonList,
+        )
+        pokemonListNavGraph(
+            onPokeminItemClicked = navController::navigateToDetailPokemon,
+            showActionBar = showActionBar,
+        )
+        historyPokemonListNavGraph(
+            onPokeminItemClicked = navController::navigateToDetailPokemon,
+        )
+        detailPokemonNavGraph(
+            onBack = { navController.popBackStack() },
+        )
     }
 }
 

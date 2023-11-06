@@ -12,4 +12,5 @@
     <string name="type">Type</string>
     <string name="rename_pokemon">Rename</string>
     <string name="release_pokemon">Release</string>
+    <string name="title_detailpokemon">Detail Pokemon</string>
 </resources>

@@ -1,91 +1,152 @@
 package com.testproject.mypokemon.histories.history
 
-import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.material3.Card
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.fragment.app.Fragment
-import androidx.fragment.app.viewModels
-import androidx.navigation.fragment.findNavController
+import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
+import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
+import com.bumptech.glide.integration.compose.GlideImage
+import com.testproject.core.extention.getImageUrl
+import com.testproject.core.templete.MainTemplate
 import com.testproject.core.theme.PokemonAppTheme
 import com.testproject.model.PokemonResponseModel
-import com.testproject.mypokemon.databinding.FragmentPokemonHistoryBinding
-import com.testproject.mypokemon.histories.history.adapter.PokemonAdapter
-import com.testproject.mypokemon.histories.history.adapter.PokemonListener
-import com.testproject.pokemonapp.utils.showSnackbar
-import dagger.hilt.android.AndroidEntryPoint
+import com.testproject.mypokemon.R
 
-@AndroidEntryPoint
-class PokemonHistoryListFragment : Fragment(), PokemonListener {
-
-    private val viewModel: PokemonHistoryListViewModel by viewModels()
-    private lateinit var binding: FragmentPokemonHistoryBinding
-
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?,
-    ): View {
-        return FragmentPokemonHistoryBinding.inflate(inflater, container, false).apply {
-            binding = this
-        }.root
-    }
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-        setUI()
-        setObserver()
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun MyPokemon(
+    modifier: Modifier = Modifier,
+    viewModel: PokemonHistoryListViewModel = hiltViewModel(),
+    onPokeminItemClicked: (Int) -> Unit = {},
+) {
+    val pokemonData by viewModel.event.collectAsState()
+    LaunchedEffect(key1 = true) {
         viewModel.getPokemonList()
-
-        /*val request = NavDeepLinkRequest.Builder
-            .fromUri("android-app://example.google.app/settings_fragment_two".toUri())
-            .build()
-        findNavController().navigate(request)*/
     }
+    PokemonHistory(
+        modifier = modifier,
+        pokemonData = pokemonData,
+        onPokeminItemClicked = onPokeminItemClicked,
+    )
+}
 
-    private fun setUI() {
-        with(binding) {
-            recyclerView.adapter = PokemonAdapter(this@PokemonHistoryListFragment)
-        }
-    }
-
-    private fun setObserver() {
-        viewModel.listPokemon.observe(viewLifecycleOwner) {
-            (binding.recyclerView.adapter as PokemonAdapter).submitList(it)
-        }
-        viewModel.event.observe(viewLifecycleOwner) {
-            it.getContentIfNotHandled()?.let {
-                requireView().showSnackbar("Pokemon kamu masih kosong")
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun PokemonHistory(
+    modifier: Modifier = Modifier,
+    pokemonData: HistoryPokemonEvent,
+    onPokeminItemClicked: (Int) -> Unit = {},
+) {
+    MainTemplate(
+        modifier = modifier,
+        topBar = {
+            TopAppBar(
+                title = {
+                    Text(text = stringResource(R.string.title_pokemonhistory))
+                },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = Color.White,
+                    titleContentColor = Color.Black,
+                ),
+            )
+        },
+        content = {
+            Column(
+                modifier = modifier.padding(it),
+                horizontalAlignment = Alignment.CenterHorizontally,
+            ) {
+                when (pokemonData) {
+                    HistoryPokemonEvent.OnEmptyData -> ShowEmptyData()
+                    is HistoryPokemonEvent.OnSuccess -> {
+                        ShowPokemonHistory(
+                            modifier = modifier,
+                            data = pokemonData.data,
+                            onPokeminItemClicked = onPokeminItemClicked,
+                        )
+                    }
+                }
             }
+        },
+    )
+}
+
+@Composable
+private fun ShowPokemonHistory(
+    modifier: Modifier = Modifier,
+    data: List<PokemonResponseModel>,
+    onPokeminItemClicked: (Int) -> Unit,
+) {
+    LazyVerticalGrid(columns = GridCells.Fixed(2)) {
+        items(data) {
+            PokemonItem(
+                modifier = modifier,
+                pokemon = it,
+                onPokeminItemClicked = onPokeminItemClicked,
+            )
         }
     }
+}
 
-    override fun onPokemonClicked(data: PokemonResponseModel) {
-        findNavController().navigate(
-            PokemonHistoryListFragmentDirections.actionPokemonHistoryListFragmentToDetailFragment(
-                data,
-            ),
-        )
+@OptIn(ExperimentalGlideComposeApi::class)
+@Composable
+fun PokemonItem(
+    modifier: Modifier = Modifier,
+    pokemon: PokemonResponseModel,
+    onPokeminItemClicked: (Int) -> Unit,
+) {
+    Card(
+        modifier = modifier
+            .padding(4.dp)
+            .clickable(enabled = true, onClick = { onPokeminItemClicked.invoke(pokemon.id) }),
+    ) {
+        Column(modifier = modifier.align(Alignment.CenterHorizontally)) {
+            GlideImage(
+                model = pokemon.url.getImageUrl(),
+                contentDescription = pokemon.name,
+                modifier.align(Alignment.CenterHorizontally),
+            )
+            Text(
+                text = pokemon.name,
+                modifier
+                    .align(Alignment.CenterHorizontally)
+                    .padding(bottom = 4.dp),
+            )
+        }
     }
 }
 
 @Composable
-fun MyPokemon(modifier: Modifier = Modifier) {
+private fun ShowEmptyData(
+    modifier: Modifier = Modifier,
+) {
     Box(
         modifier = modifier
             .fillMaxWidth()
             .fillMaxHeight(),
         contentAlignment = Alignment.Center,
     ) {
-        Text(text = "My Pokemnon")
+        Text(text = "Pokemon Kamu Masih Kosong")
     }
 }
 
@@ -93,6 +154,6 @@ fun MyPokemon(modifier: Modifier = Modifier) {
 @Composable
 private fun MyPokemonPreview() {
     PokemonAppTheme {
-        MyPokemon()
+        PokemonHistory(pokemonData = HistoryPokemonEvent.OnEmptyData)
     }
 }

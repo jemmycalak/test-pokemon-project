@@ -10,8 +10,12 @@ import com.testproject.mypokemon.histories.history.MyPokemon
  */
 
 const val HISTORYPOKEMON_ROUTE = "historypokemon_route"
-fun NavGraphBuilder.historyPokemonListNavGraph() {
+fun NavGraphBuilder.historyPokemonListNavGraph(
+    onPokeminItemClicked: (Int) -> Unit = {},
+) {
     composable(route = HISTORYPOKEMON_ROUTE) {
-        MyPokemon()
+        MyPokemon(
+            onPokeminItemClicked = onPokeminItemClicked,
+        )
     }
 }
