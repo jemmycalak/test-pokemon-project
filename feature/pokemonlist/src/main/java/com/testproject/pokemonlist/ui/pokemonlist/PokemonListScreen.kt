@@ -51,6 +51,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
+import com.bumptech.glide.integration.compose.placeholder
 import com.testproject.core.component.LoadingWheel
 import com.testproject.core.extention.getIdFromUrl
 import com.testproject.core.extention.getImageUrl
@@ -58,12 +59,13 @@ import com.testproject.core.templete.MainTemplate
 import com.testproject.core.theme.Dimens
 import com.testproject.core.theme.PokemonAppTheme
 import com.testproject.model.PokemonResponseModel
+import com.testproject.pokemonlist.R
 
 @Composable
 internal fun PokemonListScreen(
     modifier: Modifier = Modifier,
     viewModel: PokemonListViewModel = hiltViewModel(),
-    onPokeminItemClicked: (Int) -> Unit = {},
+    onPokeminItemClicked: (PokemonResponseModel) -> Unit = {},
     showActionBar: (String, String?) -> Unit = { _, _ -> },
 ) {
     val pokemonData by viewModel.pokemonData.collectAsStateWithLifecycle(
@@ -217,7 +219,7 @@ private fun ShowLoading(modifier: Modifier = Modifier) {
 private fun ShowPokemonList(
     modifier: Modifier,
     data: List<PokemonResponseModel>,
-    onPokeminItemClicked: (Int) -> Unit,
+    onPokeminItemClicked: (PokemonResponseModel) -> Unit,
 ) {
     LazyVerticalGrid(
         columns = GridCells.Fixed(2),
@@ -237,7 +239,7 @@ private fun ShowPokemonList(
 fun PokemonItem(
     modifier: Modifier = Modifier,
     pokemon: PokemonResponseModel,
-    onPokeminItemClicked: (Int) -> Unit,
+    onPokeminItemClicked: (PokemonResponseModel) -> Unit,
 ) {
     Card(
         modifier = modifier
@@ -245,7 +247,7 @@ fun PokemonItem(
             .clickable(
                 enabled = true,
                 onClick = {
-                    onPokeminItemClicked.invoke(pokemon.url.getIdFromUrl().toInt())
+                    onPokeminItemClicked.invoke(pokemon)
                 },
             ),
     ) {
@@ -254,6 +256,7 @@ fun PokemonItem(
                 model = pokemon.url.getImageUrl(),
                 contentDescription = pokemon.name,
                 modifier.align(Alignment.CenterHorizontally),
+                loading = placeholder(R.drawable.pokemon_ball)
             )
             Text(
                 text = pokemon.name,

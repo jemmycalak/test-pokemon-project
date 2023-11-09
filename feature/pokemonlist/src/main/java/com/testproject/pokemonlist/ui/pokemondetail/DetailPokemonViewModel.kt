@@ -1,13 +1,11 @@
 package com.testproject.pokemonlist.ui.pokemondetail
 
-import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.testproject.model.PokemonResponseModel
 import com.testproject.pokemonapp.core.Resource
-import com.testproject.pokemonlist.ui.navigation.POKEMONID_ARGS
+import com.testproject.pokemonlist.ui.navigation.POKEMONDATA_ARGS
 import com.testproject.pokemonusecase.PokemonRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -21,20 +19,13 @@ class DetailPokemonViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
 
-    private val _pokemon = mutableStateOf<PokemonResponseModel?>(null)
-    val pokemon: MutableState<PokemonResponseModel?> get() = _pokemon
-
-    private val pokemonId: Int = checkNotNull(savedStateHandle[POKEMONID_ARGS])
+    val pokemon: PokemonResponseModel = checkNotNull(savedStateHandle[POKEMONDATA_ARGS])
     private val _event = MutableStateFlow<DetailPokemonEvent?>(null)
     val event: StateFlow<DetailPokemonEvent?> get() = _event
 
-    fun setPokemon(pokemon: PokemonResponseModel) {
-        _pokemon.value = pokemon
-    }
-
     fun getDetailPokemon() {
         viewModelScope.launch {
-            when (val resource = repository.fetchPokemonById("$pokemonId")) {
+            when (val resource = repository.fetchPokemonById("${pokemon.id}")) {
                 is Resource.Failure -> _event.value = DetailPokemonEvent.OnNetworkError
                 Resource.Loading -> _event.value = DetailPokemonEvent.OnShowLoading
                 is Resource.Success -> {
@@ -45,7 +36,7 @@ class DetailPokemonViewModel @Inject constructor(
     }
 
     fun cathPokemon() {
-        pokemon.value?.let { value ->
+        pokemon.let { value ->
             viewModelScope.launch {
                 repository.insertPokemon(value)
                 _event.value = DetailPokemonEvent.OnSuccessInsertPokemon
@@ -54,7 +45,7 @@ class DetailPokemonViewModel @Inject constructor(
     }
 
     fun renamePokemon(newName: String = "") {
-        pokemon.value?.let { value ->
+        pokemon.let { value ->
             viewModelScope.launch {
                 repository.insertPokemon(
                     value.copy(
@@ -67,7 +58,7 @@ class DetailPokemonViewModel @Inject constructor(
     }
 
     fun releasePokemon() {
-        pokemon.value?.let { value ->
+        pokemon.let { value ->
             viewModelScope.launch {
                 repository.deletePokemon(value.id)
                 _event.value = DetailPokemonEvent.OnSuccessReleasePokemon

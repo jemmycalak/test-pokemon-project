@@ -2,6 +2,7 @@ package com.testproject.mypokemon.histories.navigation
 
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
+import com.testproject.model.PokemonResponseModel
 import com.testproject.mypokemon.histories.history.MyPokemon
 
 /**
@@ -11,7 +12,7 @@ import com.testproject.mypokemon.histories.history.MyPokemon
 
 const val HISTORYPOKEMON_ROUTE = "historypokemon_route"
 fun NavGraphBuilder.historyPokemonListNavGraph(
-    onPokeminItemClicked: (Int) -> Unit = {},
+    onPokeminItemClicked: (PokemonResponseModel) -> Unit = {},
 ) {
     composable(route = HISTORYPOKEMON_ROUTE) {
         MyPokemon(

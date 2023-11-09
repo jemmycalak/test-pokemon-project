@@ -38,7 +38,7 @@ import com.testproject.mypokemon.R
 fun MyPokemon(
     modifier: Modifier = Modifier,
     viewModel: PokemonHistoryListViewModel = hiltViewModel(),
-    onPokeminItemClicked: (Int) -> Unit = {},
+    onPokeminItemClicked: (PokemonResponseModel) -> Unit = {},
 ) {
     val pokemonData by viewModel.event.collectAsState()
     LaunchedEffect(key1 = true) {
@@ -56,7 +56,7 @@ fun MyPokemon(
 private fun PokemonHistory(
     modifier: Modifier = Modifier,
     pokemonData: HistoryPokemonEvent,
-    onPokeminItemClicked: (Int) -> Unit = {},
+    onPokeminItemClicked: (PokemonResponseModel) -> Unit = {},
 ) {
     MainTemplate(
         modifier = modifier,
@@ -95,7 +95,7 @@ private fun PokemonHistory(
 private fun ShowPokemonHistory(
     modifier: Modifier = Modifier,
     data: List<PokemonResponseModel>,
-    onPokeminItemClicked: (Int) -> Unit,
+    onPokeminItemClicked: (PokemonResponseModel) -> Unit,
 ) {
     LazyVerticalGrid(columns = GridCells.Fixed(2)) {
         items(data) {
@@ -113,12 +113,12 @@ private fun ShowPokemonHistory(
 fun PokemonItem(
     modifier: Modifier = Modifier,
     pokemon: PokemonResponseModel,
-    onPokeminItemClicked: (Int) -> Unit,
+    onPokeminItemClicked: (PokemonResponseModel) -> Unit,
 ) {
     Card(
         modifier = modifier
             .padding(4.dp)
-            .clickable(enabled = true, onClick = { onPokeminItemClicked.invoke(pokemon.id) }),
+            .clickable(enabled = true, onClick = { onPokeminItemClicked.invoke(pokemon) }),
     ) {
         Column(modifier = modifier.align(Alignment.CenterHorizontally)) {
             GlideImage(
