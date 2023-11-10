@@ -10,10 +10,15 @@ sealed class DetailPokemonEvent {
     data class OnShowDetailPokemon(
         val data: Pokemon,
     ) : DetailPokemonEvent()
+
     object OnShowLoading : DetailPokemonEvent()
     object OnNetworkError : DetailPokemonEvent()
+    data class OnSuccessCatchPokemon(
+        val data: Pokemon?,
+    ) : DetailPokemonEvent()
 
-    object OnSuccessInsertPokemon : DetailPokemonEvent()
-    data class OnSuccessRenamePokemon(val name: String) : DetailPokemonEvent()
+    data class OnSuccessRenamePokemon(
+        val data: Pokemon?,
+    ) : DetailPokemonEvent()
     object OnSuccessReleasePokemon : DetailPokemonEvent()
 }

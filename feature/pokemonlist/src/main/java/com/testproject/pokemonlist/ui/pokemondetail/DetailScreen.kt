@@ -30,6 +30,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
@@ -168,26 +169,45 @@ fun DetailPokemonScreen(
     modifier: Modifier = Modifier,
     viewModel: DetailPokemonViewModel = hiltViewModel(),
     navigateBack: () -> Unit = {},
+    showSnackBar: (String, String?) -> Unit,
 ) {
     LaunchedEffect(key1 = viewModel.pokemon) {
         viewModel.getDetailPokemon()
     }
     val pokemonData by viewModel.event.collectAsState(initial = null)
+    val context = LocalContext.current
+    LaunchedEffect(key1 = pokemonData) {
+        when (pokemonData) {
+            is DetailPokemonEvent.OnSuccessCatchPokemon -> showSnackBar(
+                context.getString(R.string.success_catch_pokemon),
+                null
+            )
+            DetailPokemonEvent.OnSuccessReleasePokemon -> {
+                showSnackBar(
+                    context.getString(R.string.success_release),
+                    null
+                )
+                navigateBack()
+            }
+            else -> Unit
+        }
+    }
+
+    val onCatchPokemon: ((Pokemon) -> Unit?)? = if (!viewModel.isCatched) {
+        { viewModel.cathPokemon() }
+    } else null
 
     DetailPokemon(
         modifier,
         pokemonData,
         navigateBack,
-        onCatchPokemon = {
-            viewModel.cathPokemon()
-        },
+        onCatchPokemon = onCatchPokemon,
         onRenamePokemon = {
             viewModel.renamePokemon()
         },
         onReleasePokemon = {
             viewModel.releasePokemon()
-            navigateBack()
-        },
+        }
     )
 }
 
@@ -197,9 +217,9 @@ private fun DetailPokemon(
     modifier: Modifier = Modifier,
     pokemonData: DetailPokemonEvent?,
     navigateBack: () -> Unit = {},
-    onCatchPokemon: (Pokemon) -> Unit = {},
-    onRenamePokemon: (Pokemon) -> Unit = {},
-    onReleasePokemon: (Pokemon) -> Unit = {},
+    onCatchPokemon: ((Pokemon) -> Unit?)? = null,
+    onRenamePokemon: ((Pokemon) -> Unit?)? = null,
+    onReleasePokemon: ((Pokemon) -> Unit?)? = null,
 ) {
     MainTemplate(
         modifier = modifier,
@@ -241,12 +261,26 @@ private fun DetailPokemon(
                             onReleasePokemon = onReleasePokemon,
                         )
                     }
-
                     DetailPokemonEvent.OnShowLoading -> ShowLoading()
-                    DetailPokemonEvent.OnSuccessInsertPokemon -> Unit
-                    DetailPokemonEvent.OnSuccessReleasePokemon -> Unit
-                    is DetailPokemonEvent.OnSuccessRenamePokemon -> Unit
-                    null -> Unit
+                    is DetailPokemonEvent.OnSuccessCatchPokemon -> {
+                        ShowPokemon(
+                            modifier = modifier,
+                            pokemon = pokemonData.data,
+                            onCatchPokemon = null,
+                            onRenamePokemon = onRenamePokemon,
+                            onReleasePokemon = onReleasePokemon,
+                        )
+                    }
+                    is DetailPokemonEvent.OnSuccessRenamePokemon -> {
+                        ShowPokemon(
+                            modifier = modifier,
+                            pokemon = pokemonData.data,
+                            onCatchPokemon = null,
+                            onRenamePokemon = onRenamePokemon,
+                            onReleasePokemon = onReleasePokemon,
+                        )
+                    }
+                    else -> Unit
                 }
             }
         },
@@ -257,166 +291,180 @@ private fun DetailPokemon(
 @Composable
 private fun ShowPokemon(
     modifier: Modifier = Modifier,
-    pokemon: Pokemon,
-    onCatchPokemon: (Pokemon) -> Unit = {},
-    onRenamePokemon: (Pokemon) -> Unit = {},
-    onReleasePokemon: (Pokemon) -> Unit = {},
+    pokemon: Pokemon?,
+    onCatchPokemon: ((Pokemon) -> Unit?)? = null,
+    onRenamePokemon: ((Pokemon) -> Unit?)? = null,
+    onReleasePokemon: ((Pokemon) -> Unit?)? = null,
 ) {
-    Box(
-        modifier = modifier
-            .fillMaxSize(),
-    ) {
-        Image(
-            modifier = modifier.fillMaxSize(),
-            painter = painterResource(id = R.drawable.background),
-            contentDescription = null,
-            contentScale = ContentScale.FillBounds,
-        )
-
-        Column(
+    pokemon?.let { pokemon ->
+        Box(
             modifier = modifier
-                .verticalScroll(rememberScrollState())
                 .fillMaxSize(),
-            horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-            Spacer(modifier = modifier.padding(top = 10.dp))
-            GlideImage(
-                model = pokemon.sprites?.other?.home?.frontDefault,
-                contentDescription = pokemon.name,
-                modifier = modifier
-                    .clip(CircleShape)
-                    .border(2.dp, Color.White, CircleShape),
+            Image(
+                modifier = modifier.fillMaxSize(),
+                painter = painterResource(id = R.drawable.background),
+                contentDescription = null,
+                contentScale = ContentScale.FillBounds,
             )
-            Spacer(modifier = modifier.padding(top = 20.dp))
-            Row(
-                modifier = modifier.fillMaxWidth()
-            ) {
-                Text(
-                    modifier = modifier.weight(1f),
-                    textAlign = TextAlign.End,
-                    text = "Name"
-                )
-                Text(
-                    modifier = modifier.weight(1f),
-                    text = ": ${pokemon.name}".uppercase(),
-                )
-            }
-            Row(
-                modifier = modifier.fillMaxWidth()
-            ) {
-                Text(
-                    modifier = modifier.weight(1f),
-                    textAlign = TextAlign.End,
-                    text = "Type"
-                )
-                Text(
-                    modifier = modifier.weight(1f),
-                    text = ": ${pokemon.types[0].type?.name}".uppercase()
-                )
-            }
-            Row(
-                modifier = modifier.fillMaxWidth()
-            ) {
-                Text(
-                    text = "HP",
-                    modifier = modifier.weight(1f),
-                    textAlign = TextAlign.End,
-                )
-                Text(
-                    text = ": ${pokemon.stats[0].baseStat}",
-                    modifier = modifier.weight(1f),
-                )
-            }
-            Row(
-                modifier = modifier.fillMaxWidth()
-            ) {
-                Text(
-                    text = "Attack",
-                    modifier = modifier.weight(1f),
-                    textAlign = TextAlign.End,
-                )
-                Text(
-                    text = ": ${pokemon.stats[1].baseStat}",
-                    modifier = modifier.weight(1f),
-                )
-            }
-            Row(
-                modifier = modifier.fillMaxWidth()
-            ) {
-                Text(
-                    text = "Defense",
-                    modifier = modifier.weight(1f),
-                    textAlign = TextAlign.End,
-                )
-                Text(
-                    text = ": ${pokemon.stats[2].baseStat}",
-                    modifier = modifier.weight(1f),
-                )
-            }
-            Row(
-                modifier = modifier.fillMaxWidth()
-            ) {
-                Text(
-                    text = "Special Attack",
-                    modifier = modifier.weight(1f),
-                    textAlign = TextAlign.End,
-                )
-                Text(
-                    text = ": ${pokemon.stats[3].baseStat}",
-                    modifier = modifier.weight(1f),
-                )
-            }
-            Row(
-                modifier = modifier.fillMaxWidth()
-            ) {
-                Text(
-                    text = "Special Defense",
-                    modifier = modifier.weight(1f),
-                    textAlign = TextAlign.End,
-                )
-                Text(
-                    text = ": ${pokemon.stats[4].baseStat}",
-                    modifier = modifier.weight(1f),
-                )
-            }
-            Row(
-                modifier = modifier.fillMaxWidth()
-            ) {
-                Text(
-                    text = "Speed",
-                    modifier = modifier.weight(1f),
-                    textAlign = TextAlign.End,
-                )
-                Text(
-                    text = ": ${pokemon.stats[5].baseStat}",
-                    modifier = modifier.weight(1f),
-                )
-            }
 
-            Button(
+            Column(
                 modifier = modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 8.dp),
-                onClick = { onCatchPokemon(pokemon) },
+                    .verticalScroll(rememberScrollState())
+                    .fillMaxSize(),
+                horizontalAlignment = Alignment.CenterHorizontally,
             ) {
-                Text(text = "TANGKAP")
+                Spacer(modifier = modifier.padding(top = 10.dp))
+                GlideImage(
+                    model = pokemon.sprites?.other?.home?.frontDefault,
+                    contentDescription = pokemon.name,
+                    modifier = modifier
+                        .clip(CircleShape)
+                        .border(2.dp, Color.White, CircleShape),
+                )
+                Spacer(modifier = modifier.padding(top = 20.dp))
+                Row(
+                    modifier = modifier.fillMaxWidth()
+                ) {
+                    Text(
+                        modifier = modifier.weight(1f),
+                        textAlign = TextAlign.End,
+                        text = "Name"
+                    )
+                    Text(
+                        modifier = modifier.weight(1f),
+                        text = ": ${pokemon.name}".uppercase(),
+                    )
+                }
+                Row(
+                    modifier = modifier.fillMaxWidth()
+                ) {
+                    Text(
+                        modifier = modifier.weight(1f),
+                        textAlign = TextAlign.End,
+                        text = "Type"
+                    )
+                    Text(
+                        modifier = modifier.weight(1f),
+                        text = ": ${pokemon.types[0].type?.name}".uppercase()
+                    )
+                }
+                Row(
+                    modifier = modifier.fillMaxWidth()
+                ) {
+                    Text(
+                        text = "HP",
+                        modifier = modifier.weight(1f),
+                        textAlign = TextAlign.End,
+                    )
+                    Text(
+                        text = ": ${pokemon.stats[0].baseStat}",
+                        modifier = modifier.weight(1f),
+                    )
+                }
+                Row(
+                    modifier = modifier.fillMaxWidth()
+                ) {
+                    Text(
+                        text = "Attack",
+                        modifier = modifier.weight(1f),
+                        textAlign = TextAlign.End,
+                    )
+                    Text(
+                        text = ": ${pokemon.stats[1].baseStat}",
+                        modifier = modifier.weight(1f),
+                    )
+                }
+                Row(
+                    modifier = modifier.fillMaxWidth()
+                ) {
+                    Text(
+                        text = "Defense",
+                        modifier = modifier.weight(1f),
+                        textAlign = TextAlign.End,
+                    )
+                    Text(
+                        text = ": ${pokemon.stats[2].baseStat}",
+                        modifier = modifier.weight(1f),
+                    )
+                }
+                Row(
+                    modifier = modifier.fillMaxWidth()
+                ) {
+                    Text(
+                        text = "Special Attack",
+                        modifier = modifier.weight(1f),
+                        textAlign = TextAlign.End,
+                    )
+                    Text(
+                        text = ": ${pokemon.stats[3].baseStat}",
+                        modifier = modifier.weight(1f),
+                    )
+                }
+                Row(
+                    modifier = modifier.fillMaxWidth()
+                ) {
+                    Text(
+                        text = "Special Defense",
+                        modifier = modifier.weight(1f),
+                        textAlign = TextAlign.End,
+                    )
+                    Text(
+                        text = ": ${pokemon.stats[4].baseStat}",
+                        modifier = modifier.weight(1f),
+                    )
+                }
+                Row(
+                    modifier = modifier.fillMaxWidth()
+                ) {
+                    Text(
+                        text = "Speed",
+                        modifier = modifier.weight(1f),
+                        textAlign = TextAlign.End,
+                    )
+                    Text(
+                        text = ": ${pokemon.stats[5].baseStat}",
+                        modifier = modifier.weight(1f),
+                    )
+                }
+                ShowButton(
+                    modifier = modifier,
+                    title = stringResource(id = R.string.catch_pokemon),
+                    pokemon = pokemon,
+                    onClick = onCatchPokemon
+                )
+                ShowButton(
+                    modifier = modifier,
+                    title = stringResource(id = R.string.rename_pokemon),
+                    pokemon = pokemon,
+                    onClick = onRenamePokemon
+                )
+                ShowButton(
+                    modifier = modifier,
+                    title = stringResource(id = R.string.release_pokemon),
+                    pokemon = pokemon,
+                    onClick = onReleasePokemon
+                )
             }
-            Button(
-                modifier = modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 8.dp),
-                onClick = { onRenamePokemon(pokemon) },
-            ) {
-                Text(text = "RENAME")
-            }
-            Button(
-                modifier = modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 8.dp),
-                onClick = { onReleasePokemon(pokemon) },
-            ) {
-                Text(text = "RElEASE")
-            }
+        }
+    }
+}
+
+@Composable
+private fun ShowButton(
+    modifier: Modifier = Modifier,
+    title: String,
+    pokemon: Pokemon,
+    onClick: ((Pokemon) -> Unit?)? = null,
+) {
+    onClick?.let {
+        Button(
+            modifier = modifier
+                .fillMaxWidth()
+                .padding(horizontal = 8.dp),
+            onClick = { onClick(pokemon) },
+        ) {
+            Text(text = title)
         }
     }
 }

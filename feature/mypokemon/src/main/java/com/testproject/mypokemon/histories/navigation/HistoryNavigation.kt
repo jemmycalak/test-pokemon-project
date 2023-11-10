@@ -12,7 +12,7 @@ import com.testproject.mypokemon.histories.history.MyPokemon
 
 const val HISTORYPOKEMON_ROUTE = "historypokemon_route"
 fun NavGraphBuilder.historyPokemonListNavGraph(
-    onPokeminItemClicked: (PokemonResponseModel) -> Unit = {},
+    onPokeminItemClicked: (PokemonResponseModel, Boolean) -> Unit,
 ) {
     composable(route = HISTORYPOKEMON_ROUTE) {
         MyPokemon(

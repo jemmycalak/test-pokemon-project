@@ -3,8 +3,10 @@ package com.testproject.pokemonlist.ui.pokemondetail
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.testproject.model.Pokemon
 import com.testproject.model.PokemonResponseModel
 import com.testproject.pokemonapp.core.Resource
+import com.testproject.pokemonlist.ui.navigation.ISCATCHED_ARGS
 import com.testproject.pokemonlist.ui.navigation.POKEMONDATA_ARGS
 import com.testproject.pokemonusecase.PokemonRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -18,8 +20,10 @@ class DetailPokemonViewModel @Inject constructor(
     private val repository: PokemonRepository,
     savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
-
     val pokemon: PokemonResponseModel = checkNotNull(savedStateHandle[POKEMONDATA_ARGS])
+    val isCatched: Boolean = checkNotNull(savedStateHandle[ISCATCHED_ARGS])
+
+    private val _pokemonDetail = MutableStateFlow<Pokemon?>(null)
     private val _event = MutableStateFlow<DetailPokemonEvent?>(null)
     val event: StateFlow<DetailPokemonEvent?> get() = _event
 
@@ -30,6 +34,7 @@ class DetailPokemonViewModel @Inject constructor(
                 Resource.Loading -> _event.value = DetailPokemonEvent.OnShowLoading
                 is Resource.Success -> {
                     _event.value = DetailPokemonEvent.OnShowDetailPokemon(resource.data)
+                    _pokemonDetail.value = resource.data
                 }
             }
         }
@@ -39,7 +44,7 @@ class DetailPokemonViewModel @Inject constructor(
         pokemon.let { value ->
             viewModelScope.launch {
                 repository.insertPokemon(value)
-                _event.value = DetailPokemonEvent.OnSuccessInsertPokemon
+                _event.value = DetailPokemonEvent.OnSuccessCatchPokemon(_pokemonDetail.value)
             }
         }
     }
@@ -47,12 +52,11 @@ class DetailPokemonViewModel @Inject constructor(
     fun renamePokemon(newName: String = "") {
         pokemon.let { value ->
             viewModelScope.launch {
-                repository.insertPokemon(
-                    value.copy(
-                        name = newName,
-                    ),
+                val newPokemon = value.copy(
+                    name = newName,
                 )
-                _event.value = DetailPokemonEvent.OnSuccessRenamePokemon(value.name)
+                repository.insertPokemon(newPokemon)
+                _event.value = DetailPokemonEvent.OnSuccessRenamePokemon(_pokemonDetail.value)
             }
         }
     }

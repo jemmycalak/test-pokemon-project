@@ -9,6 +9,8 @@
     <string name="title_history">History</string>
     <string name="title_home">Home</string>
     <string name="catch_pokemon">Tangkap</string>
+    <string name="success_catch_pokemon">Success ditangkap</string>
+    <string name="success_release">Success direlease</string>
     <string name="type">Type</string>
     <string name="rename_pokemon">Rename</string>
     <string name="release_pokemon">Release</string>

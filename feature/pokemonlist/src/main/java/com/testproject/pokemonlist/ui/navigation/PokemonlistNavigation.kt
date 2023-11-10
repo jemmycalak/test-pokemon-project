@@ -1,7 +1,6 @@
 package com.testproject.pokemonlist.ui.navigation
 
 import androidx.core.os.bundleOf
-import androidx.navigation.NavArgumentBuilder
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavType
@@ -23,34 +22,32 @@ const val DETAILPOKEMON_ROUTE = "detailpokemon_route"
 const val POKEMONID_ARGS = "pokemon_id"
 const val POKEMONNAME_ARGS = "pokemon_name"
 const val POKEMONDATA_ARGS = "pokemon_data"
+const val ISCATCHED_ARGS = "isCatched"
 private const val DEEP_LINK_URI_PATTERN =
-    "https://www.com.testproject.pokemonlist/DETAILPOKEMON_ROUTE/{$POKEMONID_ARGS}/{$POKEMONNAME_ARGS}"
+    "https://www.com.testproject.pokemonlist/DETAILPOKEMON_ROUTE/{$POKEMONID_ARGS}"
 
 fun NavGraphBuilder.pokemonListNavGraph(
-    onPokeminItemClicked: (PokemonResponseModel) -> Unit = {},
-    showActionBar: (String, String?) -> Unit,
+    onPokeminItemClicked: (PokemonResponseModel) -> Unit,
+    showSnackbar: (String, String?) -> Unit,
 ) {
     composable(route = POKEMONLIST_ROUTE) {
         PokemonListScreen(
             onPokeminItemClicked = onPokeminItemClicked,
-            showActionBar = showActionBar,
+            showActionBar = showSnackbar,
         )
     }
 }
 
 fun NavGraphBuilder.detailPokemonNavGraph(
     onBack: () -> Unit,
+    showSnackBar: (String, String?) -> Unit,
 ) {
     composable(
-        route = "$DETAILPOKEMON_ROUTE/{$POKEMONID_ARGS}/{$POKEMONNAME_ARGS}",
+        route = "$DETAILPOKEMON_ROUTE/{$POKEMONID_ARGS}",
         arguments = listOf(
             navArgument(POKEMONID_ARGS) {
                 type = NavType.StringType
                 defaultValue = "-1"
-            },
-            navArgument(POKEMONNAME_ARGS) {
-                type = NavType.StringType
-                defaultValue = ""
             },
         ),
         deepLinks = listOf(
@@ -59,6 +56,7 @@ fun NavGraphBuilder.detailPokemonNavGraph(
     ) {
         DetailPokemonScreen(
             navigateBack = onBack,
+            showSnackBar = showSnackBar,
         )
     }
 }
@@ -72,10 +70,16 @@ fun NavController.navigateToPokemonList(fromPage: String) {
     }
 }
 
-fun NavController.navigateToDetailPokemon(pokemon: PokemonResponseModel) {
-    graph.findNode("$DETAILPOKEMON_ROUTE/{$POKEMONID_ARGS}/{$POKEMONNAME_ARGS}")?.id?.let { destinationId ->
-        navigate(destinationId, bundleOf(POKEMONDATA_ARGS to pokemon.copy(
-            id = pokemon.url.getIdFromUrl().toInt()
-        )))
+fun NavController.navigateToDetailPokemon(
+    pokemon: PokemonResponseModel,
+    isCatched: Boolean = false
+) {
+    graph.findNode("$DETAILPOKEMON_ROUTE/{$POKEMONID_ARGS}")?.id?.let { destinationId ->
+        navigate(
+            destinationId, bundleOf(
+                POKEMONDATA_ARGS to pokemon.copy(id = pokemon.url.getIdFromUrl().toInt()),
+                ISCATCHED_ARGS to isCatched
+            )
+        )
     }
 }

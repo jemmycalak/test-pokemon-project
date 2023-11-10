@@ -69,7 +69,7 @@ fun PokemonMain() {
         NavHostPokemon(
             modifier = Modifier.padding(paddingValues),
             navController = rememberNavCompose,
-            showActionBar = { message, action ->
+            showSnackBar = { message, action ->
                 scope.launch {
                     snackbarHostState.showSnackbar(
                         message = message,
@@ -86,7 +86,7 @@ fun PokemonMain() {
 fun NavHostPokemon(
     modifier: Modifier = Modifier,
     navController: NavHostController,
-    showActionBar: (String, String?) -> Unit,
+    showSnackBar: (String, String?) -> Unit,
 ) {
     NavHost(
         navController = navController,
@@ -98,13 +98,14 @@ fun NavHostPokemon(
         )
         pokemonListNavGraph(
             onPokeminItemClicked = navController::navigateToDetailPokemon,
-            showActionBar = showActionBar,
+            showSnackbar = showSnackBar,
         )
         historyPokemonListNavGraph(
             onPokeminItemClicked = navController::navigateToDetailPokemon,
         )
         detailPokemonNavGraph(
             onBack = { navController.popBackStack() },
+            showSnackBar = showSnackBar
         )
     }
 }
