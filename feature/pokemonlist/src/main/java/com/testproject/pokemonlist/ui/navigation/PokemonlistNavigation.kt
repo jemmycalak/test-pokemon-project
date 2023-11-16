@@ -77,7 +77,7 @@ fun NavController.navigateToDetailPokemon(
     graph.findNode("$DETAILPOKEMON_ROUTE/{$POKEMONID_ARGS}")?.id?.let { destinationId ->
         navigate(
             destinationId, bundleOf(
-                POKEMONDATA_ARGS to pokemon.copy(id = pokemon.url.getIdFromUrl().toInt()),
+                POKEMONDATA_ARGS to pokemon,
                 ISCATCHED_ARGS to isCatched
             )
         )

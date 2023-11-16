@@ -11,5 +11,6 @@ interface PokemonRepository {
     fun getPokemonList(offset: Int, limit: Int): Flow<Resource<PokemonListResponseModel>>
     suspend fun getPokemonListHistory(): List<PokemonResponseModel>
     suspend fun insertPokemon(pokemon: PokemonResponseModel)
+    suspend fun upsertPokemon(pokemon: PokemonResponseModel)
     suspend fun deletePokemon(id: Int)
 }

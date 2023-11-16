@@ -3,6 +3,7 @@ package com.testproject.model
 import android.os.Parcelable
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import com.google.gson.annotations.SerializedName
 import kotlinx.parcelize.Parcelize
 
 /**
@@ -13,7 +14,9 @@ import kotlinx.parcelize.Parcelize
 @Parcelize
 data class PokemonResponseModel(
     @PrimaryKey(autoGenerate = true)
-    val id: Int,
-    val name: String,
-    val url: String,
+    val id: Int = 0,
+    @SerializedName("name")
+    val name: String = "",
+    @SerializedName("url")
+    val url: String = "",
 ) : Parcelable

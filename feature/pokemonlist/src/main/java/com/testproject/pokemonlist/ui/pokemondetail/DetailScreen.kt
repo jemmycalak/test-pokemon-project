@@ -25,6 +25,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -43,126 +46,7 @@ import com.testproject.core.templete.MainTemplate
 import com.testproject.core.theme.PokemonAppTheme
 import com.testproject.model.Pokemon
 import com.testproject.pokemonlist.R
-
-/*
-@AndroidEntryPoint
-class DetailFragment : Fragment(), InputNameDialogFragment.Listener {
-
-    private val args: DetailFragmentArgs by navArgs()
-    private var _binding: FragmentDetailBinding? = null
-    private val binding get() = _binding!!
-    private val viewModel: DetailPokemonViewModel by viewModels()
-
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?,
-    ): View {
-        _binding = FragmentDetailBinding.inflate(inflater, container, false)
-        return binding.root
-    }
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-        initUI()
-        setObserver()
-        viewModel.getDetailPokemon(args.pokemon.url.getIdFromUrl())
-    }
-
-    private fun initUI() {
-        with(binding) {
-            val visibleButtonCatch = if (args.isCatched) View.GONE else View.VISIBLE
-            val visibleButtonRelease = if (args.isCatched) View.VISIBLE else View.GONE
-            cathPokemon.apply {
-                setOnClickListener {
-                    viewModel.cathPokemon(args.pokemon)
-                    visibility = visibleButtonRelease
-                }
-                visibility = visibleButtonCatch
-            }
-            renamePokemon.apply {
-                visibility = visibleButtonRelease
-                setOnClickListener {
-                    InputNameDialogFragment.create(args.pokemon.name).apply {
-                        setListener(this@DetailFragment)
-                    }.show(childFragmentManager, this@DetailFragment::class.java.name)
-                }
-            }
-            releasePokemon.apply {
-                visibility = visibleButtonRelease
-                setOnClickListener {
-                    viewModel.releasePokemon(args.pokemon)
-                    findNavController().popBackStack()
-                }
-            }
-        }
-    }
-
-    private fun setObserver() {
-        viewModel.loadPokemon.observe(viewLifecycleOwner) {
-            when (it) {
-                is Resource.Loading -> Unit
-                is Resource.Success -> {
-                    setupViews(it.data)
-                }
-
-                is Resource.Failure -> Snackbar.make(
-                    requireView(),
-                    "Error get detail pokemon",
-                    Snackbar.LENGTH_LONG,
-                ).show()
-            }
-        }
-        viewModel.event.observe(viewLifecycleOwner) {
-            it.getContentIfNotHandled()?.let { event ->
-                when (event) {
-                    is DetailPokemonEvent.OnSuccessInsertPokemon -> {
-                        requireView().showSnackbar("Sukses Menangkap Pokemon")
-                    }
-
-                    is DetailPokemonEvent.OnSuccessReleasePokemon -> {
-                        requireView().showSnackbar("Sukses Release Pokemon")
-                    }
-
-                    is DetailPokemonEvent.OnSuccessRenamePokemon -> {
-                        requireView().showSnackbar("Sukses Rename Pokemon")
-                        binding.pokemonName.text = event.name
-                    }
-                }
-            }
-        }
-    }
-
-    private fun setupViews(pokemon: Pokemon) {
-        with(binding) {
-            Glide.with(requireContext()).load(pokemon.sprites?.other?.home?.frontDefault)
-                .into(pokemonImage)
-            pokemonType1.text = pokemon.types[0].type?.name
-            hp.text = pokemon.stats[0].baseStat.toString()
-            attack.text = pokemon.stats[1].baseStat.toString()
-            defense.text = pokemon.stats[2].baseStat.toString()
-            specialAttack.text = pokemon.stats[3].baseStat.toString()
-            specialDefense.text = pokemon.stats[4].baseStat.toString()
-            speed.text = pokemon.stats[5].baseStat.toString()
-
-            val name = if (args.isCatched) args.pokemon.name else pokemon.name
-            pokemonName.text = name
-        }
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        _binding = null
-    }
-
-    override fun onSaveName(name: String) {
-        viewModel.renamePokemon(
-            args.pokemon.copy(
-                name = name,
-            ),
-        )
-    }
-}*/
+import com.testproject.pokemonlist.ui.renamepokemon.ShowRenameDialog
 
 @Composable
 fun DetailPokemonScreen(
@@ -182,6 +66,7 @@ fun DetailPokemonScreen(
                 context.getString(R.string.success_catch_pokemon),
                 null
             )
+
             DetailPokemonEvent.OnSuccessReleasePokemon -> {
                 showSnackBar(
                     context.getString(R.string.success_release),
@@ -189,37 +74,64 @@ fun DetailPokemonScreen(
                 )
                 navigateBack()
             }
+
             else -> Unit
         }
     }
-
+    var isShowRenameDialog by remember {
+        mutableStateOf<Pair<Boolean, Pokemon?>>(
+            Pair(
+                false,
+                null
+            )
+        )
+    }
     val onCatchPokemon: ((Pokemon) -> Unit?)? = if (!viewModel.isCatched) {
         { viewModel.cathPokemon() }
     } else null
+    val onShowRenameDialog: ((Pokemon) -> Unit?)? = if (viewModel.isCatched) {
+        { pokemon ->
+            isShowRenameDialog = Pair(true, pokemon)
+            null
+        }
+    } else null
+    val onRenamePokemon: ((Pokemon) -> Unit?)? = if (viewModel.isCatched) {
+        { pokemon -> viewModel.renamePokemon(pokemon.name.orEmpty()) }
+    } else null
+    val onReleasePokemon: ((Pokemon) -> Unit?)? = if (viewModel.isCatched) {
+        {
+            viewModel.releasePokemon()
+        }
+    } else null
+    val onRenameDialogDismiss = {
+        isShowRenameDialog = Pair(false, null)
+    }
 
     DetailPokemon(
         modifier,
         pokemonData,
         navigateBack,
+        isShowRenameDialog,
         onCatchPokemon = onCatchPokemon,
-        onRenamePokemon = {
-            viewModel.renamePokemon()
-        },
-        onReleasePokemon = {
-            viewModel.releasePokemon()
-        }
+        onRenamePokemon = onRenamePokemon,
+        onReleasePokemon = onReleasePokemon,
+        onRenameDialogDismiss = onRenameDialogDismiss,
+        onShowRenameDialog = onShowRenameDialog,
     )
 }
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalGlideComposeApi::class)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun DetailPokemon(
     modifier: Modifier = Modifier,
     pokemonData: DetailPokemonEvent?,
     navigateBack: () -> Unit = {},
+    isShowRenameDialog: Pair<Boolean, Pokemon?>? = null,
     onCatchPokemon: ((Pokemon) -> Unit?)? = null,
     onRenamePokemon: ((Pokemon) -> Unit?)? = null,
     onReleasePokemon: ((Pokemon) -> Unit?)? = null,
+    onRenameDialogDismiss: () -> Unit = {},
+    onShowRenameDialog: ((Pokemon) -> Unit?)? = null,
 ) {
     MainTemplate(
         modifier = modifier,
@@ -257,10 +169,11 @@ private fun DetailPokemon(
                             modifier = modifier,
                             pokemon = pokemonData.data,
                             onCatchPokemon = onCatchPokemon,
-                            onRenamePokemon = onRenamePokemon,
+                            onRenamePokemon = onShowRenameDialog,
                             onReleasePokemon = onReleasePokemon,
                         )
                     }
+
                     DetailPokemonEvent.OnShowLoading -> ShowLoading()
                     is DetailPokemonEvent.OnSuccessCatchPokemon -> {
                         ShowPokemon(
@@ -271,6 +184,7 @@ private fun DetailPokemon(
                             onReleasePokemon = onReleasePokemon,
                         )
                     }
+
                     is DetailPokemonEvent.OnSuccessRenamePokemon -> {
                         ShowPokemon(
                             modifier = modifier,
@@ -280,9 +194,16 @@ private fun DetailPokemon(
                             onReleasePokemon = onReleasePokemon,
                         )
                     }
+
                     else -> Unit
                 }
             }
+            ShowRenameDialog(
+                isShowBottomSheet = isShowRenameDialog?.first ?: false,
+                pokemon = isShowRenameDialog?.second,
+                onRenamePokemon = onRenamePokemon,
+                onDismissDialog = onRenameDialogDismiss
+            )
         },
     )
 }
@@ -481,6 +402,8 @@ private fun ShowError() {
 @Composable
 private fun MyPokemonPreview() {
     PokemonAppTheme {
-        DetailPokemon(pokemonData = DetailPokemonEvent.OnShowLoading)
+        DetailPokemon(
+            pokemonData = DetailPokemonEvent.OnShowLoading,
+        )
     }
 }

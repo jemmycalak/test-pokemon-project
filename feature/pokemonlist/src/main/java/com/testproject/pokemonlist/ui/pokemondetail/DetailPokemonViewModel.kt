@@ -3,6 +3,7 @@ package com.testproject.pokemonlist.ui.pokemondetail
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.testproject.core.extention.getIdFromUrl
 import com.testproject.model.Pokemon
 import com.testproject.model.PokemonResponseModel
 import com.testproject.pokemonapp.core.Resource
@@ -29,11 +30,14 @@ class DetailPokemonViewModel @Inject constructor(
 
     fun getDetailPokemon() {
         viewModelScope.launch {
-            when (val resource = repository.fetchPokemonById("${pokemon.id}")) {
+            val pokemonId = pokemon.url.getIdFromUrl()
+            when (val resource = repository.fetchPokemonById(pokemonId)) {
                 is Resource.Failure -> _event.value = DetailPokemonEvent.OnNetworkError
                 Resource.Loading -> _event.value = DetailPokemonEvent.OnShowLoading
                 is Resource.Success -> {
-                    _event.value = DetailPokemonEvent.OnShowDetailPokemon(resource.data)
+                    _event.value = DetailPokemonEvent.OnShowDetailPokemon(resource.data.copy(
+                        name = pokemon.name
+                    ))
                     _pokemonDetail.value = resource.data
                 }
             }
@@ -55,8 +59,10 @@ class DetailPokemonViewModel @Inject constructor(
                 val newPokemon = value.copy(
                     name = newName,
                 )
-                repository.insertPokemon(newPokemon)
-                _event.value = DetailPokemonEvent.OnSuccessRenamePokemon(_pokemonDetail.value)
+                repository.upsertPokemon(newPokemon)
+                _event.value = DetailPokemonEvent.OnSuccessRenamePokemon(_pokemonDetail.value?.copy(
+                    name = newName
+                ))
             }
         }
     }

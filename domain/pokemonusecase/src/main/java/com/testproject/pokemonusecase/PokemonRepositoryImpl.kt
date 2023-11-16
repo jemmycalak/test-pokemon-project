@@ -34,6 +34,10 @@ class PokemonRepositoryImpl @Inject constructor(
         pokemonDataSource.insertPokemon(pokemon)
     }
 
+    override suspend fun upsertPokemon(pokemon: PokemonResponseModel) {
+        pokemonDataSource.upsertPokemon(pokemon)
+    }
+
     override suspend fun deletePokemon(id: Int) {
         pokemonDataSource.deletePokemon(id)
     }
