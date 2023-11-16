@@ -49,8 +49,6 @@ dependencies {
     implementation project(":core")
     implementation project(":data:model")
     implementation project(":domain:pokemonusecase")
-    implementation project(":feature:mypokemon_contract")
-    implementation project(":feature:pokemonlist_contract")
 
     // compose
     implementation("androidx.activity:activity-compose:1.8.0")
