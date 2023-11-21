@@ -1,14 +1,15 @@
 package com.testproject.pokemonlist.ui.pokemonlist
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
+import androidx.compose.runtime.State
+import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.testproject.model.PokemonResponseModel
 import com.testproject.pokemonapp.core.Resource
-import com.testproject.core.Event
 import com.testproject.pokemonusecase.PokemonRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -16,23 +17,41 @@ import javax.inject.Inject
 class PokemonListViewModel @Inject constructor(
     private val repository: PokemonRepository,
 ) : ViewModel() {
-    private val _listPokemon = MutableLiveData<List<PokemonResponseModel>>()
-    val listPokemon: LiveData<List<PokemonResponseModel>> get() = _listPokemon
 
-    private val _event = MutableLiveData<Event<PokemonListEvent>>()
-    val event: LiveData<Event<PokemonListEvent>> get() = _event
+    private val _event = MutableStateFlow<PokemonListEvent>(PokemonListEvent.OnLoading)
+    private val event: StateFlow<PokemonListEvent> = _event
 
-    fun getPokemonList(offset: Int, limit: Int) {
+    val offset = MutableStateFlow(0)
+    private val _keyword = mutableStateOf("")
+    val keyword: State<String> get() = _keyword
+
+    val pokemonData = combine(event) { data ->
+        data[0]
+    }
+
+    fun searchPokemon(query: String) {
+        _keyword.value = query
+        getPokemonList(query, 0)
+    }
+
+    fun getPokemonList(
+        query: String,
+        offset: Int,
+        limit: Int = 100,
+    ) {
         viewModelScope.launch {
-            when (val resource = repository.getPokemonList(offset, limit)) {
-                is Resource.Success -> {
-                    _listPokemon.value = resource.data.results
+            repository.getPokemonList(offset, limit).collect {
+                when (it) {
+                    is Resource.Success -> {
+                        _event.emit(PokemonListEvent.OnSuccess(it.data.results))
+                    }
+
+                    is Resource.Failure -> {
+                        _event.emit(PokemonListEvent.OnNetworkError)
+                    }
+
+                    else -> Unit
                 }
-                is Resource.Loading -> Unit
-                is Resource.Failure -> {
-                    _event.value = Event(PokemonListEvent.OnNetworkError)
-                }
-                else -> Unit
             }
         }
     }

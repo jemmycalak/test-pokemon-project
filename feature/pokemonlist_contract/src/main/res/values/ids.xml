@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <item name="detail_pokemon_nav_graph" type="id"/>
+    <item name="list_pokemon_nav_graph" type="id" />
+    <item name="pokemonListFragment" type="id" />
+</resources>

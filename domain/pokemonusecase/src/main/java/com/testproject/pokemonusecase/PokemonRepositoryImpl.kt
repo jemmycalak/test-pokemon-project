@@ -5,6 +5,8 @@ import com.testproject.model.Pokemon
 import com.testproject.model.PokemonListResponseModel
 import com.testproject.model.PokemonResponseModel
 import com.testproject.pokemonapp.core.Resource
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
 import javax.inject.Inject
 
 class PokemonRepositoryImpl @Inject constructor(
@@ -15,11 +17,13 @@ class PokemonRepositoryImpl @Inject constructor(
         return pokemonDataSource.fetchPokemonById(id)
     }
 
-    override suspend fun getPokemonList(
+    override fun getPokemonList(
         offset: Int,
         limit: Int,
-    ): Resource<PokemonListResponseModel> {
-        return pokemonDataSource.getPokemonList(offset, limit)
+    ): Flow<Resource<PokemonListResponseModel>> {
+        return flow {
+            emit(pokemonDataSource.getPokemonList(offset, limit))
+        }
     }
 
     override suspend fun getPokemonListHistory(): List<PokemonResponseModel> {
@@ -28,6 +32,10 @@ class PokemonRepositoryImpl @Inject constructor(
 
     override suspend fun insertPokemon(pokemon: PokemonResponseModel) {
         pokemonDataSource.insertPokemon(pokemon)
+    }
+
+    override suspend fun upsertPokemon(pokemon: PokemonResponseModel) {
+        pokemonDataSource.upsertPokemon(pokemon)
     }
 
     override suspend fun deletePokemon(id: Int) {

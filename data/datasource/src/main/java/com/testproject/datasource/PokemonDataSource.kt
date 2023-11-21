@@ -49,7 +49,11 @@ class PokemonDataSource @Inject constructor(
     }
 
     suspend fun insertPokemon(pokemon: PokemonResponseModel) {
-        pokemonDAO.insert(pokemon)
+        pokemonDAO.insert(pokemon.copy(id = 0))
+    }
+
+    suspend fun upsertPokemon(pokemon: PokemonResponseModel) {
+        pokemonDAO.upsert(pokemon)
     }
 
     suspend fun deletePokemon(id: Int) {

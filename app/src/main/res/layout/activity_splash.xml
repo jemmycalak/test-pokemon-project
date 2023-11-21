@@ -6,8 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     app:applyMotionScene="true"
-    app:layoutDescription="@xml/splash_animation"
-    tools:context=".ui.splash.SplashActivity">
+    app:layoutDescription="@xml/splash_animation">
 
     <ImageView
         android:id="@+id/ball"
