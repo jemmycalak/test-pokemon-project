@@ -6,20 +6,26 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.lazy.grid.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.pullrefresh.PullRefreshIndicator
+import androidx.compose.material.pullrefresh.pullRefresh
+import androidx.compose.material.pullrefresh.rememberPullRefreshState
 import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -33,6 +39,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -53,14 +60,16 @@ import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
 import com.bumptech.glide.integration.compose.placeholder
 import com.testproject.core.component.LoadingWheel
-import com.testproject.core.extention.getIdFromUrl
 import com.testproject.core.extention.getImageUrl
 import com.testproject.core.templete.MainTemplate
 import com.testproject.core.theme.Dimens
 import com.testproject.core.theme.PokemonAppTheme
 import com.testproject.model.PokemonResponseModel
 import com.testproject.pokemonlist.R
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
 internal fun PokemonListScreen(
     modifier: Modifier = Modifier,
@@ -73,6 +82,17 @@ internal fun PokemonListScreen(
     )
     val keyword by viewModel.keyword
     val focusRequester = remember { FocusRequester() }
+    var isRefreshing by remember { mutableStateOf(false) }
+
+    val pullRefreshState =
+        rememberPullRefreshState(
+            refreshing = isRefreshing,
+            onRefresh = {
+                isRefreshing = true
+                viewModel.onRefreshing()
+            },
+        )
+
     LaunchedEffect(pokemonData) {
         when (pokemonData) {
             PokemonListEvent.OnNetworkError -> {
@@ -83,8 +103,8 @@ internal fun PokemonListScreen(
         }
     }
 
-    LaunchedEffect(key1 = true) {
-        viewModel.getPokemonList(keyword, 0)
+    LaunchedEffect(Unit) {
+        viewModel.getPokemonList(keyword)
     }
 
     MainTemplate(
@@ -99,24 +119,39 @@ internal fun PokemonListScreen(
             )
         },
         content = {
-            Column(
-                modifier = modifier.padding(it),
-                horizontalAlignment = Alignment.CenterHorizontally,
+            Box(
+                modifier = modifier
+                    .fillMaxSize()
+                    .padding(it)
+                    .pullRefresh(pullRefreshState)
             ) {
-                when (pokemonData) {
-                    is PokemonListEvent.OnLoading -> {
-                        ShowLoading(modifier)
-                    }
+                Column(
+                    modifier = modifier
+                        .fillMaxSize(),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                ) {
+                    when (pokemonData) {
+                        is PokemonListEvent.OnLoading -> {
+                            ShowLoading(modifier)
+                        }
 
-                    is PokemonListEvent.OnSuccess -> {
-                        ShowPokemonList(
-                            modifier = modifier,
-                            data = (pokemonData as PokemonListEvent.OnSuccess).data,
-                            onPokeminItemClicked = onPokeminItemClicked,
-                        )
-                    }
+                        is PokemonListEvent.OnSuccess -> {
+                            ShowPokemonList(
+                                modifier = modifier,
+                                data = (pokemonData as PokemonListEvent.OnSuccess).data,
+                                onPokeminItemClicked = onPokeminItemClicked,
+                                onLoadMore = { viewModel.onLoadMore() },
+                                isRefeshing = isRefreshing
+                            )
+                        }
 
-                    else -> Unit
+                        else -> Unit
+                    }
+                    Spacer(modifier = modifier)
+                }
+
+                if (isRefreshing) {
+                    ShowLoading()
                 }
             }
         },
@@ -220,18 +255,27 @@ private fun ShowPokemonList(
     modifier: Modifier,
     data: List<PokemonResponseModel>,
     onPokeminItemClicked: (PokemonResponseModel) -> Unit,
+    onLoadMore: (() -> Unit)? = null,
+    isRefeshing: Boolean = false,
 ) {
     LazyVerticalGrid(
         columns = GridCells.Fixed(2),
     ) {
-        items(data) { pokemon ->
-            PokemonItem(
-                modifier = modifier,
-                pokemon = pokemon,
-                onPokeminItemClicked = onPokeminItemClicked,
-            )
+        itemsIndexed(data) { index, pokemon ->
+            if (!isRefeshing) {
+                PokemonItem(
+                    modifier = modifier,
+                    pokemon = pokemon,
+                    onPokeminItemClicked = onPokeminItemClicked,
+                )
+            }
+            val isLoadMore = index == data.size - 1
+            if (isLoadMore) {
+                onLoadMore?.invoke()
+            }
         }
     }
+
 }
 
 @OptIn(ExperimentalGlideComposeApi::class)

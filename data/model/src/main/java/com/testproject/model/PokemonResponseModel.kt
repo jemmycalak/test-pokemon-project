@@ -15,8 +15,6 @@ import kotlinx.parcelize.Parcelize
 data class PokemonResponseModel(
     @PrimaryKey(autoGenerate = true)
     val id: Int = 0,
-    @SerializedName("name")
     val name: String = "",
-    @SerializedName("url")
     val url: String = "",
 ) : Parcelable

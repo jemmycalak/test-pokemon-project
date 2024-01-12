@@ -1,5 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<resources>
-    <item name="history_pokemon_nav_graph" type="id"/>
-    <item name="pokemonHistoryListFragment" type="id"/>
-</resources>

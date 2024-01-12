@@ -85,6 +85,8 @@ private fun PokemonHistory(
                             onPokeminItemClicked = onPokeminItemClicked,
                         )
                     }
+
+                    else -> Unit
                 }
             }
         },
