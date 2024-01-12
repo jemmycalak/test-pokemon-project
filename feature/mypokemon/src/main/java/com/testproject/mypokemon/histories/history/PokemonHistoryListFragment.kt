@@ -150,7 +150,7 @@ private fun ShowEmptyData(
             .fillMaxHeight(),
         contentAlignment = Alignment.Center,
     ) {
-        Text(text = "Pokemon Kamu Masih Kosong")
+        Text(text = stringResource(id = R.string.label_empty_pokemon))
     }
 }
 

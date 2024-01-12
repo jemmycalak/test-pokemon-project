@@ -48,6 +48,8 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
@@ -83,6 +85,7 @@ internal fun PokemonListScreen(
     val keyword by viewModel.keyword
     val focusRequester = remember { FocusRequester() }
     var isRefreshing by remember { mutableStateOf(false) }
+    val context = LocalContext.current
 
     val pullRefreshState =
         rememberPullRefreshState(
@@ -90,13 +93,14 @@ internal fun PokemonListScreen(
             onRefresh = {
                 isRefreshing = true
                 viewModel.onRefreshing()
+                isRefreshing = false
             },
         )
 
     LaunchedEffect(pokemonData) {
         when (pokemonData) {
             PokemonListEvent.OnNetworkError -> {
-                showActionBar("Failed load data", null)
+                showActionBar(context.getString(R.string.error_failed_load_data), null)
             }
 
             else -> Unit
@@ -160,7 +164,7 @@ internal fun PokemonListScreen(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SearchBar(
+internal fun SearchBar(
     query: String,
     modifier: Modifier = Modifier,
     isEnabled: (Boolean) = true,
@@ -225,7 +229,7 @@ fun SearchBar(
             ),
             placeholder = {
                 Text(
-                    text = "Cari disini...",
+                    text = stringResource(id = R.string.label_search_here),
                     fontSize = 14.sp,
                 )
             },
@@ -246,7 +250,7 @@ private fun ShowLoading(modifier: Modifier = Modifier) {
             .fillMaxWidth(),
         contentAlignment = Alignment.Center,
     ) {
-        LoadingWheel("Loading....")
+        LoadingWheel(stringResource(id = R.string.label_loading))
     }
 }
 
@@ -280,7 +284,7 @@ private fun ShowPokemonList(
 
 @OptIn(ExperimentalGlideComposeApi::class)
 @Composable
-fun PokemonItem(
+private fun PokemonItem(
     modifier: Modifier = Modifier,
     pokemon: PokemonResponseModel,
     onPokeminItemClicked: (PokemonResponseModel) -> Unit,

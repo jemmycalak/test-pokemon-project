@@ -15,4 +15,7 @@
     <string name="rename_pokemon">Rename</string>
     <string name="release_pokemon">Release</string>
     <string name="title_detailpokemon">Detail Pokemon</string>
+    <string name="error_failed_load_data">Failed load data</string>
+    <string name="label_search_here">Cari disini...</string>
+    <string name="label_loading">Loading....</string>
 </resources>
